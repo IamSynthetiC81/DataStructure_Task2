@@ -1,4 +1,4 @@
-package src.DynamicMemory;
+package src.BinarySearchTree.DynamicMemory;
 
 import src.Operations;
 import src.Statistics.Statistics;

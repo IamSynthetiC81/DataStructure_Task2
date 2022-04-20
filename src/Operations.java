@@ -1,6 +1,6 @@
 package src;
 
-import src.DynamicMemory.Node;
+import src.BinarySearchTree.DynamicMemory.Node;
 
 public interface Operations {
 

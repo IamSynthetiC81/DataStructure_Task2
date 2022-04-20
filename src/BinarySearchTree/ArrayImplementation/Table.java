@@ -1,4 +1,4 @@
-package src.ArrayImplementation;
+package src.BinarySearchTree.ArrayImplementation;
 
 
 /**
@@ -203,7 +203,7 @@ public class Table{
      */
     void RemoveNode(int index) throws IllegalArgumentException{
         if(index < 0 || index >= table.length){                                         // Check if the index is valid
-            throw new IllegalArgumentException("Index is not valid");                   // If not, throw an exception
+            throw new IllegalArgumentException("Index is not valid");                // If not, throw an exception
         }
 
         int parent = findParent(index);                                                 // Find the parent of the node

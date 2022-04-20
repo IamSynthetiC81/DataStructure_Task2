@@ -1,4 +1,4 @@
-package src.DynamicMemory;
+package src.BinarySearchTree.DynamicMemory;
 
 /**
  * This class represents a node in a binary search tree.
@@ -21,6 +21,8 @@ public class Node {
         Parent = parent;
         Height = height;
     }
+    
+    
 
     public Node getLeft() {
         return LeftChild;
@@ -34,8 +36,9 @@ public class Node {
         return Right;
     }
 
+
     public void setRight(Node right) {
-        Right = right;
+        Right = right;  
     }
 
     public int getInfo() {

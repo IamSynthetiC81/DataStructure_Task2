@@ -1,7 +1,7 @@
-package src.DynamicMemory.Tests;
+package src.BinarySearchTree.DynamicMemory.Tests.src.DynamicMemory.Tests;
 
 import        org.junit.jupiter.api.Test;
-import src.DynamicMemory.BST;
+import src.BinarySearchTree.DynamicMemory.BST;
 import static org.junit.jupiter.api.Assertions.*;
 
 import        org.junit.jupiter.api.BeforeEach;
