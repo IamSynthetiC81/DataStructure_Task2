@@ -1,7 +1,10 @@
+package src.Files;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import src.DataImport.FileOps;
+
+import src.Files.FileOps;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +18,9 @@ class FileOpsTest {
     
     @BeforeEach
     void setUp() {
-        UUT = new FileOps(new File(Path));  // Create the object
+        assertDoesNotThrow(()-> {
+            UUT = new FileOps(Path);
+        });
     }
     
     @AfterEach

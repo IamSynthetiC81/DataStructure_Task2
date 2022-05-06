@@ -1,26 +1,31 @@
 package src.BinarySearchTree.ArrayImplementation;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Rule;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.rules.Timeout;
+import src.Files.FileOps;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
-
-class TableTest {
+class BSTArrayImplementationTest {
 
     private final static int SIZE = 10;
     private final static int[] testArray = {10, 50, 60, 70, 100, 120, 55, 30, 40, 20};
 
-
-    Table UUT;
-
+    BST_ArrayImplementation UUT;
+    
+    @Rule
+    Timeout globalTimeout = Timeout.seconds(2);
+    
     @BeforeEach
     void setUp() {
-        UUT = new Table(10);
+        UUT = new BST_ArrayImplementation(10);
     }
 
     @AfterEach
@@ -33,29 +38,26 @@ class TableTest {
     @ValueSource(ints = {120, 70, 60, 10 })
     void delete(int number) {
         for(int T : testArray)                              // Inserts all the elements of the testArray into the table
-            UUT.Append(T);
+            UUT.Push(T);
 
-        UUT.Delete(number);                                 // Deletes the element with the given number
+        UUT.Pull(number);                                 // Deletes the element with the given number
 
 
         switch (number) {
             case 10:
-                assertEquals(-1,UUT.findParent(UUT.Search(50)), " The parent of the new root should be -1");
                 assertEquals(2,UUT.getChildrenNum(UUT.Search(50)), " The number of children of the new root should be 2");
                 assertNotNull(UUT.table[UUT.Search(50)][1], " The left child of the new root should not be null");
                 assertNotNull(UUT.table[UUT.Search(50)][1], " The right child of the new root should not be null");
-                assertEquals(30,UUT.getInfo(UUT.getLeftChild(UUT.Search(50))), " The left child of the new root should be 30");
-                assertEquals(60,UUT.getInfo(UUT.getRightChild(UUT.Search(50))), " The right child of the new root should be 60");
+                assertEquals(30,UUT.Value(UUT.Left(UUT.Search(50))), " The left child of the new root should be 30");
+                assertEquals(60,UUT.Value(UUT.Right(UUT.Search(50))), " The right child of the new root should be 60");
                 break;
             case 60:
-                assertEquals(55,UUT.table[UUT.findParent(UUT.Search(70))][0], " The parent child should now be 55");
                 assertEquals(1,UUT.getChildrenNum(UUT.Search(55)), " The number of children of the parent should be 1");
-                assertEquals(70,UUT.getInfo(UUT.getRightChild(UUT.Search(55))), " The child should now be 70");
+                assertEquals(70,UUT.Value(UUT.Right(UUT.Search(55))), " The child should now be 70");
                 break;
             case 70:
-                assertEquals(60,UUT.table[UUT.findParent(UUT.Search(100))][0], " The parent of the child should now be 60");
                 assertEquals(2,UUT.getChildrenNum(UUT.Search(60)), " The number of children of the parent should be 2");
-                assertEquals(100,UUT.table[UUT.getRightChild(UUT.Search(60))][0], " The child of the parent should be 100");
+                assertEquals(100,UUT.table[UUT.Right(UUT.Search(60))][0], " The child of the parent should be 100");
                 break;
             case 120:
                 assertEquals(0,UUT.getChildrenNum(UUT.Search(100)), " The number of children of the parent should be 0");
@@ -68,12 +70,20 @@ class TableTest {
     @Test
     @DisplayName("Tests whether the table is constructed correctly")
     void append() {
+        UUT.Reset();
+
         for(int T : testArray)
-            UUT.Append(T);
+            UUT.Push(T);
 
-        for(int i = 0; i < SIZE; i++)
+        System.out.println(UUT.getDuration().toNanos() + " milliseconds | Accesses : " + UUT.getCounter());
+
+        UUT.Reset();
+
+        for(int i = 0; i < SIZE; i++) {
             assertNotEquals(testArray[i], -1, "Element " + i + " not found");
-
+            assertTrue(UUT.isBST(UUT.Root), "The tree constructed incorrectly");
+        }
+        
         assertEquals(1, UUT.getChildrenNum(UUT.Search(10)), "Wrong children number for 10");
         assertEquals(2, UUT.getChildrenNum(UUT.Search(50)), "Wrong children number for 50");
         assertEquals(2, UUT.getChildrenNum(UUT.Search(30)), "Wrong children number for 30");
@@ -148,7 +158,72 @@ class TableTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {10, 100,1000,10000, 100000, 1000000})
+    @DisplayName("Tst Appending large amounts of data into the tree")
+    void LargeScaleAppend(int size) {
+        
+        UUT = new BST_ArrayImplementation(size);
+        
+        int[] arr = ThreadLocalRandom.current().ints(0, Integer.MAX_VALUE).distinct().limit(size).toArray();
+        
+        System.out.println("Done generating random numbers");
+        
+        assertTimeout(Duration.ofSeconds(10), () -> {
+            for(int i = 0; i < size; i++){
+                UUT.Push(arr[i]);
+            }
+        }, "Append took too long");
+    
+        assertTrue(UUT.isBST(UUT.Root), "Tree is not constructed correctly");
+        
+        System.out.print("Done appending " + size + " elements | ");
+        System.out.println("Accesses: " + UUT.getCounter()/size + "\n");
+        
+    }
+    
+    @RepeatedTest(10)
+    void TestThatBreaks(){
+        UUT = new BST_ArrayImplementation(10);
+    
+        int[] arr = ThreadLocalRandom.current().ints(0, 300).distinct().limit(10).toArray();
+        
+        for(int val : arr)
+            UUT.Push(val);
+        
+        assertTrue(UUT.isBST(UUT.Root), "Tree is not constructed correctly");
+        
+        int counter = 0;
+        for(int val : arr) {
+            UUT.Pull(val);
+            counter++;
+            assertTrue(UUT.isBST(UUT.Root), "The tree is incorrect after the " + counter + "th deletion");
+        }
+    }
+    
     @Test
-    void search() {
+    @DisplayName("Test the functionality of each method against real data")
+    void RealWorldScenario() throws IOException {
+        FileOps DataFile = new FileOps("src/Files/keys_1000000_BE.bin");
+        FileOps DelFile = new FileOps("src/Files/keys_del_100_BE.bin");
+    
+        int[] InsertionKeys = DataFile.Read();
+        int[] DeletionKeys = DelFile.Read();
+    
+        UUT = new BST_ArrayImplementation(InsertionKeys.length);
+        
+        for (int key : InsertionKeys)
+            UUT.Push(key);
+        
+        assertTrue(UUT.isBST(UUT.Root), " Tree is not constructed correctly");
+    
+        System.out.println("Done inserting");
+        int counter = 0;
+    
+        for (int key : DeletionKeys) {
+            UUT.Pull(key);
+            counter++;
+            assertTrue(UUT.isBST(UUT.Root), "The tree is incorrect after the " + counter + "th deletion");
+        }
     }
 }

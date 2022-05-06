@@ -1,6 +1,4 @@
-package src.DataImport;
-
-import org.junit.platform.console.shadow.picocli.CommandLine;
+package src.Files;
 
 import java.io.*;
 
@@ -17,8 +15,9 @@ public class FileOps {
         }
     }
     
-    public FileOps(String path){
+    public FileOps(String path) {
         this.file = new File(path);
+        assert file.exists()  : "File does was not found";
         try {
             this.raf = new RandomAccessFile(file.getPath(), "rw");
         } catch (Exception e) {

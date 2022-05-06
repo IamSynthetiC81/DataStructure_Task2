@@ -1,4 +1,4 @@
-package src.BinarySearchTree.DynamicMemory;
+package src.BinarySearchTree.DynamicImplementation;
 
 /**
  * This class represents a node in a binary search tree.
@@ -8,22 +8,32 @@ public class Node {
     protected Node LeftChild;
     protected Node Right;
     protected Node Parent;
-
     private int Info;
-    private int Height;
 
 
-    Node(Integer info, int height, Node parent) {
+    Node(Integer info, Node parent) {
         Info = info;
         LeftChild = null;
         Right = null;
 
         Parent = parent;
-        Height = height;
     }
     
+    /**
+     * Returns the number of children of this node.
+     * @return the number of children of this node.
+     */
+    public int getChildrenNumber() {
+        int number = 0;
+        if (LeftChild != null) {
+            number++;
+        }
+        if (Right != null) {
+            number++;
+        }
+        return number;
+    }
     
-
     public Node getLeft() {
         return LeftChild;
     }
@@ -35,8 +45,7 @@ public class Node {
     public Node getRight() {
         return Right;
     }
-
-
+    
     public void setRight(Node right) {
         Right = right;  
     }
@@ -47,14 +56,6 @@ public class Node {
     
     public void setInfo(int info) {
         Info = info;
-    }
-
-    public int getHeight() {
-        return Height;
-    }
-
-    public void setHeight(int height) {
-        Height = height;
     }
 
     public Node getParent() {
